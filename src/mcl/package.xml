@@ -1,7 +1,7 @@
 <package>
   <name>gmapping</name>
   <version>0.0.0</version>
-  <description>Map an unkown environement and encapsulate the data in grid occupancy map</description>
+  <description>Localize in a known environement using Monte Carlo Localization</description>
   <author>Zarak Khan</author>
   <maintainer email="zarakkhan23951@hotmail.co.uk">Zarak Khan</maintainer>
   <license>Apache 2.0</license>
