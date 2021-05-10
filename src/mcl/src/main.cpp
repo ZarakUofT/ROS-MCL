@@ -1,3 +1,11 @@
+#include <ros/console.h>
+#include "ros/ros.h"
+#include <geometry_msgs/Twist.h>
+#include <sensor_msgs/LaserScan.h>
+#include <iostream>
+
+#include <nav_msgs/Odometry.h>
+#include <tf/transform_datatypes.h>
 #include <chrono>
 #include <matplot/matplot.h>
 
@@ -20,18 +28,15 @@ const float MAX_RANGE = 3.5; // in meters
 //Callbacks
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-    laserData->angleMin = msg->angle_min;
-    laserData->angleMax = msg->angle_max;
-    laserData->angleInc = msg->angle_increment;
-    laserData->range_data = msg->ranges;
+
 }
 
 void odomCallback(const nav_msgs::Odometry::ConstPtr & msg){
-    posX = msg->pose.pose.position.x;
-    posY = msg->pose.pose.position.y;
-    yaw = tf::getYaw(msg->pose.pose.orientation);
-    if (yaw < 0.0)
-        yaw += 2 * M_PI;
+    // posX = msg->pose.pose.position.x;
+    // posY = msg->pose.pose.position.y;
+    // yaw = tf::getYaw(msg->pose.pose.orientation);
+    // if (yaw < 0.0)
+    //     yaw += 2 * M_PI;
     // ROS_INFO("Position: (%f,%f) Orientation:%f rad or %f degrees", posX, posY, yaw, RAD2DEG(yaw));
 }
 

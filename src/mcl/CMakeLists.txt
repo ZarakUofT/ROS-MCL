@@ -35,17 +35,9 @@ catkin_package()
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-add_library(map
-    src/map.h
-    src/map.cpp
-)
-
-target_link_libraries(map ${catkin_LIBRARIES})
-target_link_libraries(map matplot)
-
-add_dependencies(map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add the publisher example
 add_executable(main src/main.cpp)
-target_link_libraries(main map matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
+target_link_libraries(main matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
 
