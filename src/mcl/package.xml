@@ -1,5 +1,5 @@
 <package>
-  <name>gmapping</name>
+  <name>mcl</name>
   <version>0.0.0</version>
   <description>Localize in a known environement using Monte Carlo Localization</description>
   <author>Zarak Khan</author>

@@ -2,6 +2,7 @@
 #define MATH_H
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 #include <deque>
 #include <math.h>
@@ -193,6 +194,25 @@ bool resizeDeq(std::deque<std::deque<T>>& deq, uint16_t resize_by_width, uint16_
     }
 
     return true;
+}
+
+double normalize(double z)
+{
+  return atan2(sin(z),cos(z));
+}
+double angle_diff(double a, double b)
+{
+  double d1, d2;
+  a = normalize(a);
+  b = normalize(b);
+  d1 = a-b;
+  d2 = 2*M_PI - fabs(d1);
+  if(d1 > 0)
+    d2 *= -1.0;
+  if(fabs(d1) < fabs(d2))
+    return(d1);
+  else
+    return(d2);
 }
 
 }

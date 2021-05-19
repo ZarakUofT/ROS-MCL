@@ -1,29 +1,10 @@
-#include <ros/console.h>
-#include "ros/ros.h"
-#include <geometry_msgs/Twist.h>
-#include <sensor_msgs/LaserScan.h>
-#include <iostream>
-
-#include <nav_msgs/Odometry.h>
-#include <tf/transform_datatypes.h>
-#include <chrono>
-#include <matplot/matplot.h>
+#include "particle.h"
 
 #define RAD2DEG(rad)((rad) * 180 / M_PI)
 #define DEG2RAD(deg)((deg) * M_PI/180)
 
-struct velocity{
-    float linear;
-    float angular;
-
-    void set_vals(float _linear, float _angular){
-        linear = _linear;
-        angular = _angular;
-    }
-};
-
 //Global Variables
-const float MAX_RANGE = 3.5; // in meters
+const float LIDAR_MAX_RANGE = 3.5; // in meters
 
 //Callbacks
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
@@ -45,8 +26,6 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "MCL");
     ros::NodeHandle nh;
     ros::Subscriber laser_sub = nh.subscribe("scan", 10, &laserCallback);
-
-    ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 
     ros::Subscriber odom = nh.subscribe("odom", 1, &odomCallback);
 
