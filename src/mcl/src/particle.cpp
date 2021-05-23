@@ -32,16 +32,18 @@ void Particle::applyOdomMotionModel(Pose* newOdom)
 
     delta_rot1 = Math::angle_diff(atan2(this->odomData->delta->y, this->odomData->delta->x), this->odomData->currOdom->yaw);
     delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
-    delta_rot2 = Math::angle_diff(Math::angle_diff(newOdom->yaw, this->odomData->currOdom->yaw), delta_rot1);
+    delta_rot2 = Math::angle_diff(Math::angle_diff(this->odomData->currOdom->yaw, this->odomData->currOdom->yaw), delta_rot1);
 
     delta_rot1_hat = Math::angle_diff(delta_rot1,
-                    Math::sample_normal_dist(0, this->alpha1 * delta_rot1 + this->alpha2 * delta_trans));
+                     Math::sample_normal_dist(0, this->alpha1 * delta_rot1 + 
+                            this->alpha2 * delta_trans));
     delta_trans_hat = delta_trans - 
-            Math::sample_normal_dist(0, this->alpha3*delta_trans +
-                                this->alpha4*delta_rot1 +
-                                this->alpha4*delta_rot2);
+                      Math::sample_normal_dist(0, this->alpha3*delta_trans +
+                            this->alpha4*delta_rot1 +
+                            this->alpha4*delta_rot2);
     delta_rot2_hat = Math::angle_diff(delta_rot2,
-                Math::sample_normal_dist(0, this->alpha1 * delta_rot2 + this->alpha2 * delta_trans));
+                     Math::sample_normal_dist(0, this->alpha1 * delta_rot2 + 
+                            this->alpha2 * delta_trans));
 
     this->pose->x += delta_trans_hat * cos(this->pose->yaw + delta_rot1_hat);
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
