@@ -1,17 +1,8 @@
 #ifndef __PARTICLE_H__
 #define __PARTICLE_H__
 
-#include "math.h"
-
-// ROS Includes
-#include <ros/ros.h>
-#include <ros/console.h>
-#include <geometry_msgs/Twist.h>
-#include <sensor_msgs/LaserScan.h>
-#include <nav_msgs/Odometry.h>
-#include <tf/transform_datatypes.h>
-
-#include <matplot/matplot.h>
+#include "base.h"
+#include "odom.h"
 
 struct Pose{
     double x, y, yaw;
@@ -22,12 +13,14 @@ struct Pose{
 
 class Particle{
 private:
-    Pose* pose;
-    Pose* prevOdom;
+    std::shared_ptr<Pose> pose;
+    std::shared_ptr<OdomData> odomData;
+    
     uint32_t mapPosX, mapPosY;
     static double alpha1, alpha2, alpha3, alpha4;
 public:
-    Particle(Pose _pose, Pose prev_pose);
+    Particle(std::shared_ptr<OdomData> odom_data);
+    Particle(std::shared_ptr<Pose> _pose, std::shared_ptr<OdomData> odom_data);
     ~Particle();
 
     static void initParticle(double a1, double a2, double a3, double a4);

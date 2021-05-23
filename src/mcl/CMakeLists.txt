@@ -37,9 +37,19 @@ catkin_add_gtest(math_test src/tests/test_math.cpp)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-add_dependencies(${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(particle
+    src/particle.h
+    src/particle.cpp
+)
+
+add_library(odom
+    src/odom.h
+    src/odom.cpp
+)
+
+add_dependencies(particle odom ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add the publisher example
 add_executable(main src/main.cpp)
-target_link_libraries(main matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
+target_link_libraries(main particle odom matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
 

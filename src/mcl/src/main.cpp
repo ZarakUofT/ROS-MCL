@@ -6,6 +6,9 @@
 //Global Variables
 const float LIDAR_MAX_RANGE = 3.5; // in meters
 
+//Temp Global Variable
+std::shared_ptr<OdomData> odom_data = std::make_shared<OdomData>();
+
 //Callbacks
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
@@ -13,12 +16,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 }
 
 void odomCallback(const nav_msgs::Odometry::ConstPtr & msg){
-    // posX = msg->pose.pose.position.x;
-    // posY = msg->pose.pose.position.y;
-    // yaw = tf::getYaw(msg->pose.pose.orientation);
-    // if (yaw < 0.0)
-    //     yaw += 2 * M_PI;
-    // ROS_INFO("Position: (%f,%f) Orientation:%f rad or %f degrees", posX, posY, yaw, RAD2DEG(yaw));
+    odom_data->odomCallback(msg);
 }
 
 int main(int argc, char **argv)
