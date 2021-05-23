@@ -35,6 +35,7 @@ public:
     // Update funcs
     void update();
     void applyOdomMotionModel(Pose* newOdom);
+    void applySensorModel();
 
 };
 #endif // __PARTICLE_H__

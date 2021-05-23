@@ -33,6 +33,8 @@ endif()
 
 catkin_package()
 
+catkin_add_gtest(math_test src/tests/test_math.cpp)
+
 include_directories(${OpenCV_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 add_dependencies(${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

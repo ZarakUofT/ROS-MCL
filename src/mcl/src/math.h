@@ -6,6 +6,7 @@
 #include <vector>
 #include <deque>
 #include <math.h>
+#include <random>
 #include <limits>
 #include <algorithm>
 #include <memory>
@@ -200,13 +201,15 @@ double normalize(double z)
 {
   return atan2(sin(z),cos(z));
 }
+
+// Angle difference in radians
 double angle_diff(double a, double b)
 {
   double d1, d2;
   a = normalize(a);
   b = normalize(b);
-  d1 = a-b;
-  d2 = 2*M_PI - fabs(d1);
+  d1 = a - b;
+  d2 = 2 * M_PI - fabs(d1);
   if(d1 > 0)
     d2 *= -1.0;
   if(fabs(d1) < fabs(d2))
@@ -215,6 +218,41 @@ double angle_diff(double a, double b)
     return(d2);
 }
 
+// Draw randomly from a zero-mean Gaussian distribution, with standard
+// deviation sigma.
+// We use the polar form of the Box-Muller transformation, explained here:
+//   http://www.taygeta.com/random/gaussian.html
+double sample_gaussian_dist(double sigma)
+{
+  double x1, x2, w, r;
+
+  do
+  {
+    do { r = drand48(); } while (r==0.0);
+    x1 = 2.0 * r - 1.0;
+    do { r = drand48(); } while (r==0.0);
+    x2 = 2.0 * r - 1.0;
+    w = x1*x1 + x2*x2;
+  } while(w > 1.0 || w==0.0);
+
+  return(sigma * x2 * sqrt(-2.0*log(w)/w));
+}
+
+double sample_normal_dist(double mean, double sigma)
+{
+
+     // random device class instance, source of 'true' randomness for initializing random seed
+    std::random_device rd; 
+
+    // Mersenne twister PRNG, initialized with seed from previous random device instance
+    std::mt19937 gen(rd()); 
+    
+    // instance of class std::normal_distribution with specific mean and stddev
+    std::normal_distribution<float> d(mean, sigma); 
+
+    // get random number with normal distribution using gen as random source
+    return d(gen);
+}
 }
 
 #endif
