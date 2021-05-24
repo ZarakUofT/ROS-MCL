@@ -15,7 +15,7 @@ class Particle{
 private:
     std::shared_ptr<Pose> pose;
     std::shared_ptr<OdomData> odomData;
-    
+
     uint32_t mapPosX, mapPosY;
     static double alpha1, alpha2, alpha3, alpha4;
 public:
@@ -27,7 +27,7 @@ public:
     
     // Update funcs
     void update();
-    void applyOdomMotionModel(Pose* newOdom);
+    void applyOdomMotionModel();
     void applySensorModel();
 
 };

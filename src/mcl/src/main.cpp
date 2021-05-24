@@ -4,7 +4,8 @@
 #define DEG2RAD(deg)((deg) * M_PI/180)
 
 //Global Variables
-const float LIDAR_MAX_RANGE = 3.5; // in meters
+const double LIDAR_MAX_RANGE = 3.5; // in meters
+const double ANGLE_INCREMENT = 0.017501922324299812;
 
 //Temp Global Variable
 std::shared_ptr<OdomData> odom_data = std::make_shared<OdomData>();

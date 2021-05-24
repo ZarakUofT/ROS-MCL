@@ -22,11 +22,8 @@ void Particle::update()
     
 }
 
-void Particle::applyOdomMotionModel(Pose* newOdom) 
-{
-    if (!newOdom)
-        return;
-    
+void Particle::applyOdomMotionModel() 
+{    
     double delta_rot1, delta_trans, delta_rot2;
     double delta_rot1_hat, delta_trans_hat, delta_rot2_hat;
 
@@ -49,4 +46,9 @@ void Particle::applyOdomMotionModel(Pose* newOdom)
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
     this->pose->yaw += delta_rot1_hat + delta_rot2_hat;
 
+}
+
+void Particle::applySensorModel() 
+{
+    
 }

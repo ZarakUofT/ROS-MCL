@@ -47,9 +47,14 @@ add_library(odom
     src/odom.cpp
 )
 
-add_dependencies(particle odom ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(map
+    src/map.h
+    src/map.cpp
+)
+
+add_dependencies(particle map odom ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add the publisher example
 add_executable(main src/main.cpp)
-target_link_libraries(main particle odom matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
+target_link_libraries(main map particle odom matplot ${catkin_LIBRARIES} ${OpenCV_LIB})
 
