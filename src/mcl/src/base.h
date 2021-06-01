@@ -11,6 +11,4 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_datatypes.h>
 
-// #include <matplot/matplot.h>
-
 #endif // __BASE_H__

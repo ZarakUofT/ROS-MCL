@@ -8,9 +8,29 @@
 #include <math.h>
 #include <random>
 #include <limits>
+#include <limits.h>
 #include <algorithm>
 #include <memory>
 #include <future>
+
+#define RAD2DEG(rad)((rad) * 180 / M_PI)
+#define DEG2RAD(deg)((deg) * M_PI/180)
+#define ARRAY_2D_to_1D(i, j, mcol)((i * mcol) + j)
+#define ARRAY_1D_to_2D(n, mcol, row, col) {row = n / mcol; col = n % mcol;}
+
+struct Coordinates2D{
+    uint x, y;
+
+    Coordinates2D()
+        :x(UINT_MAX), y(UINT_MAX)   {}
+
+    Coordinates2D(uint xx, uint yy)
+        :x(xx), y(yy)   {}
+
+    bool isInfinity(){
+        return this->x == UINT_MAX && this->y == UINT_MAX;
+    }       
+};
 
 namespace Math
 {
@@ -35,7 +55,14 @@ double compute_slope(T x1, T y1, T x2, T y2)
     return 0.;  
 }
 
-void lowGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int>>& res)
+// compute Euclidian distance between two points
+template<typename T>
+double euclidian_distance(T x1, T y1, T x2, T y2)
+{
+    return sqrt(((x2 - x1) * (x2 - x1))  + ((y2 - y1) * (y2 - y1)));
+}
+
+void lowGradient(int x1, int y1, int x2, int y2, std::vector<Coordinates2D>& res)
 {
     int dx = x2 - x1;
     int dy = y2 - y1;
@@ -54,7 +81,7 @@ void lowGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int>
     int incr = (x1 > x2) ? -1 : 1;
 
     for(int i = x1; i <= x2;){
-        res.push_back(std::make_pair(i, y));
+        res.push_back(Coordinates2D(i, y));
         if (D > 0){
             y = y + yi;
             D = D + (2 * (dy - dx));
@@ -65,7 +92,7 @@ void lowGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int>
     }
 }
 
-void highGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int>>& res)
+void highGradient(int x1, int y1, int x2, int y2, std::vector<Coordinates2D>& res)
 {
     int dx = x2 - x1;
     int dy = y2 - y1;
@@ -84,7 +111,7 @@ void highGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int
     int incr = (y1 > y2) ? -1 : 1;
 
     for(int i = y1; i <= y2;){
-        res.push_back(std::make_pair(x, i));
+        res.push_back(Coordinates2D(x, i));
         if (D > 0){
             x = x + xi;
             D = D + (2 * (dx - dy));
@@ -97,9 +124,9 @@ void highGradient(int x1, int y1, int x2, int y2, std::vector<std::pair<int, int
 
 //This function takes in integer coordinates and returns a vector of pairs containing x and y coordinates of the line
 //joining the two points
-std::vector<std::pair<int, int>> bresenhamsAlgo(int x1, int y1, int x2, int y2) 
+std::vector<Coordinates2D> bresenhamsAlgo(int x1, int y1, int x2, int y2) 
 {
-    std::vector<std::pair<int, int>> res;
+    std::vector<Coordinates2D> res;
     if (abs(y2 - y1) < abs(x2 - x1)){
         if (x1 > x2)
             lowGradient(x2, y2, x1, y1, res);
@@ -113,19 +140,19 @@ std::vector<std::pair<int, int>> bresenhamsAlgo(int x1, int y1, int x2, int y2)
     }
 
     //Make sure it's returned in the right format
-    if (res[0].first != x1 && res[0].second != x2)
+    if (res[0].x != x1 && res[0].y != x2)
         std::reverse(res.begin(), res.end());
 
     return res;
 }
 
 // Determine the destination pos in a 2D array given the orientation and range value
-std::pair<uint16_t, uint16_t> pos_in_2d_array(const uint16_t map_width, const uint16_t map_height, 
-    const uint16_t pos_x, const uint16_t pos_y, 
+Coordinates2D pos_in_2d_array(const uint map_width, const uint map_height, 
+    const uint pos_x, const uint pos_y, 
     const float yaw, const float phi, float range, const float r_max)
 {
     if (!map_width || !map_height)
-        return {};
+        return Coordinates2D(0, 0);
 
     int row = pos_x, col = pos_y;
     if (range > r_max){
@@ -145,7 +172,7 @@ std::pair<uint16_t, uint16_t> pos_in_2d_array(const uint16_t map_width, const ui
     else if (col > map_height - 1)
         col = map_height - 1;
     
-    return std::make_pair((uint16_t)row, (uint16_t)col);
+    return Coordinates2D((uint)row, (uint)col);
 }
 
 //Converts probability into logit function
