@@ -194,7 +194,7 @@ void Map::computeAngularRanges()
 {
     auto start_time = std::chrono::system_clock::now();
     
-    int num_threads = 4;
+    int num_threads = 8;
     uint increm = this->occupancyGridMap.size() / num_threads;
     uint start = 0, end = increm;
 
