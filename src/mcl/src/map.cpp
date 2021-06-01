@@ -163,7 +163,7 @@ double Map::computeEuclidian(uint x1, uint y1, uint x2, uint y2){
     return distance * this->gridCellSize;
 }
 
-bool Map::computeAngularRangesthread_func(uint start, uint end){
+bool Map::computeAngularRangesThread_func(uint start, uint end){
     float phi;
     Coordinates2D coords, position;
     double dist;
@@ -194,13 +194,13 @@ void Map::computeAngularRanges()
 {
     auto start_time = std::chrono::system_clock::now();
     
-    int num_threads = 8;
+    int num_threads = 4;
     uint increm = this->occupancyGridMap.size() / num_threads;
     uint start = 0, end = increm;
 
     std::vector<std::thread> threads;
     for (int i = 0; i < num_threads; i++){
-        threads.push_back(std::thread(&Map::computeAngularRangesthread_func, this, start, end));
+        threads.push_back(std::thread(&Map::computeAngularRangesThread_func, this, start, end));
         start = end;
         end += increm;
     }

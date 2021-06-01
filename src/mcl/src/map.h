@@ -37,7 +37,7 @@ private:
     bool stillPlotting;
 
     // thread functions private
-    bool computeAngularRangesthread_func(uint start, uint end);
+    bool computeAngularRangesThread_func(uint start, uint end);
 
 public:
     Map(double range_sensor_max_range, double range_sensor_angle_increment);
