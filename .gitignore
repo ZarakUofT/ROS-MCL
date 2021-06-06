@@ -4,5 +4,3 @@ devel/*
 lib/*
 msg_gen/*
 srv_gen/*
-.vscode/*
-src/mcl/src/.vscode/settings.json
