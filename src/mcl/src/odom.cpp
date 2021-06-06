@@ -17,7 +17,7 @@ OdomData::OdomData(std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> curr_od
 
 OdomData::~OdomData() {}
 
-void OdomData::odomCallback(const nav_msgs::Odometry::ConstPtr & msg) 
+void OdomData::callback(const nav_msgs::Odometry::ConstPtr & msg) 
 {
     double x, y, yaw;
     x = msg->pose.pose.position.x;

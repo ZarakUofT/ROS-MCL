@@ -21,7 +21,7 @@ public:
     OdomData(std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> currOdom);
     virtual ~OdomData();
 
-    void odomCallback(const nav_msgs::Odometry::ConstPtr & msg);
+    void callback(const nav_msgs::Odometry::ConstPtr & msg);
 };
 
 #endif // __ODOM_H__

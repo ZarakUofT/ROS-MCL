@@ -8,15 +8,16 @@ const int MAP_RENDER_CYCLE = 5;
 
 //Temp Global Variable
 std::shared_ptr<OdomData> odom_data = std::make_shared<OdomData>();
+std::shared_ptr<LidarData> lidar_data = std::make_shared<LidarData>();
 
 //Callbacks
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-
+    lidar_data->callback(msg);
 }
 
 void odomCallback(const nav_msgs::Odometry::ConstPtr & msg){
-    odom_data->odomCallback(msg);
+    odom_data->callback(msg);
 }
 
 int main(int argc, char **argv)
@@ -34,12 +35,11 @@ int main(int argc, char **argv)
     auto start = std::chrono::system_clock::now();
     uint64_t secondsElapsed = 0;
 
-    std::shared_ptr<Map> map = std::make_shared<Map>(LIDAR_MAX_RANGE, ANGLE_INCREMENT);
+    std::shared_ptr<Map> map = std::make_shared<Map>(360, LIDAR_MAX_RANGE, ANGLE_INCREMENT);
     std::string pathToFile = "/home/zarak/mcl/src/mcl/src";
 
     map->loadMapFromFile(pathToFile, "grid_map.csv", true);
     map->update_image();
-    map->saveAngularRanges(pathToFile + "/angular_ranges.txt", 268, 316);
 
     while(ros::ok()) {
         ros::spinOnce();

@@ -1,7 +1,8 @@
 #include "map.h"
 
-Map::Map(double range_sensor_max_range, double range_sensor_angle_increment) 
-    : rangeSensorMaxRange(range_sensor_max_range), 
+Map::Map(u_int16_t laser_beams, double range_sensor_max_range, double range_sensor_angle_increment) 
+    :   gridCellSize(0.01), laserBeams(laser_beams),
+        rangeSensorMaxRange(range_sensor_max_range), 
         rangeSensorAngleIncrement(range_sensor_angle_increment),
         occupancyGridMap({}), mapWidth(0), mapHeight(0),
         stillPlotting(false), threadCreatedForPlotting(false){
@@ -9,13 +10,14 @@ Map::Map(double range_sensor_max_range, double range_sensor_angle_increment)
     this->init_figure();
 }
 
-Map::Map(double range_sensor_max_range, double range_sensor_angle_increment, 
-        std::vector<grid_cell_t>& grid, uint map_width, uint map_height) 
-    : rangeSensorMaxRange(range_sensor_max_range), 
+Map::Map(u_int16_t laser_beams, double range_sensor_max_range, double range_sensor_angle_increment, 
+        std::vector<grid_cell_t>& grid, uint map_width, uint map_height, double grid_cell_size) 
+    :   gridCellSize(grid_cell_size), laserBeams(laser_beams), 
+        rangeSensorMaxRange(range_sensor_max_range), 
         rangeSensorAngleIncrement(range_sensor_angle_increment), 
         occupancyGridMap(grid), mapWidth(map_width), mapHeight(map_height),
-        stillPlotting(false), threadCreatedForPlotting(false), gridCellSize(0.01) {
-
+        stillPlotting(false), threadCreatedForPlotting(false)
+{
     this->init_figure();
 }
 
@@ -174,13 +176,13 @@ bool Map::computeAngularRangesThread_func(uint start, uint end){
         phi = 0.0;
         ARRAY_1D_to_2D(i, this->mapHeight, coords.x, coords.y);
 
-        while (phi < DEG2RAD(360)) {
+        while (phi < DEG2RAD(this->laserBeams)) {
             position = Math::pos_in_2d_array(this->mapWidth, this->mapHeight, coords.x, coords.y, 0.0, phi, 
                 this->rangeSensorMaxRange / this->gridCellSize, this->rangeSensorMaxRange / this->gridCellSize);
 
             position = this->bresenhams(coords.x, coords.y, static_cast<int>(position.x), static_cast<int>(position.y));
             dist = (position.isInfinity()) ? INFINITY : this->computeEuclidian(coords.x, coords.y, position.x, position.y);
-            this->occupancyGridMap[i].expectedRange.push_back(dist);
+            this->occupancyGridMap[i].expectedRange.push_back(static_cast<float>(dist));
 
             phi += 2 * (this->rangeSensorAngleIncrement);
         }
