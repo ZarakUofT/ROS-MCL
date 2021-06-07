@@ -11,11 +11,12 @@ typedef struct odom{
 } odom_t;
 
 class OdomData{
-    friend class Particle;
 private:
+
+public:
     std::shared_ptr<odom_t> delta;
     std::shared_ptr<odom_t> currOdom;
-public:
+
     OdomData();
     OdomData(std::shared_ptr<odom_t> curr_odom);
     OdomData(std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> currOdom);

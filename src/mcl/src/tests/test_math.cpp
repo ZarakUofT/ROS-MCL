@@ -63,6 +63,12 @@ TEST(MathTests, TestAngleDiff) {
     ASSERT_NEAR(M_PI/8, angleDiff, 0.01);
 }
 
+TEST(MathTests, TestRandomNumbers) {
+    std::vector<uint> nums;
+    Math::random_integers_in_range((uint)0, (uint)10000, (uint)10, nums);
+    ASSERT_NO_FATAL_FAILURE();
+}
+
 int main(int argc, char* argv[]){
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

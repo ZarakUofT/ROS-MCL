@@ -1,21 +1,25 @@
 #include "map.h"
 
-Map::Map(u_int16_t laser_beams, double range_sensor_max_range, double range_sensor_angle_increment) 
-    :   gridCellSize(0.01), laserBeams(laser_beams),
+Map::Map(u_int16_t laser_beams, double range_sensor_max_range, double range_sensor_angle_increment,
+        uint ref_row, uint ref_col) 
+    :   occupancyGridMap({}), mapWidth(0), mapHeight(0),
+        refRow(ref_row), refCol(ref_col),
+        laserBeams(laser_beams), gridCellSize(0.01),
         rangeSensorMaxRange(range_sensor_max_range), 
-        rangeSensorAngleIncrement(range_sensor_angle_increment),
-        occupancyGridMap({}), mapWidth(0), mapHeight(0),
+        rangeSensorAngleIncrement(range_sensor_angle_increment), angleIncrement(DEG2RAD(360 / laser_beams)),
         stillPlotting(false), threadCreatedForPlotting(false){
 
     this->init_figure();
 }
 
 Map::Map(u_int16_t laser_beams, double range_sensor_max_range, double range_sensor_angle_increment, 
-        std::vector<grid_cell_t>& grid, uint map_width, uint map_height, double grid_cell_size) 
-    :   gridCellSize(grid_cell_size), laserBeams(laser_beams), 
+        std::vector<grid_cell_t>& grid, uint map_width, uint map_height, double grid_cell_size,
+        uint ref_row, uint ref_col) 
+    :   occupancyGridMap(grid), mapWidth(map_width), mapHeight(map_height),
+        refRow(ref_row), refCol(ref_col),
+        laserBeams(laser_beams), gridCellSize(grid_cell_size), 
         rangeSensorMaxRange(range_sensor_max_range), 
-        rangeSensorAngleIncrement(range_sensor_angle_increment), 
-        occupancyGridMap(grid), mapWidth(map_width), mapHeight(map_height),
+        rangeSensorAngleIncrement(range_sensor_angle_increment), angleIncrement(DEG2RAD(360 / laser_beams)),
         stillPlotting(false), threadCreatedForPlotting(false)
 {
     this->init_figure();
@@ -49,6 +53,10 @@ void Map::loadMapFromFile(std::string& path_to_file, std::string file_name,
     std::stringstream sss(line);
     sss >> this->gridCellSize >> c >> this->mapWidth >> c >> this->mapHeight;
 
+    // set refrows and cols
+    this->refRow = this->mapWidth / 2;
+    this->refCol = this->mapHeight / 2;
+
     while (std::getline(in_file, line)){
         std::stringstream ss(line);
 
@@ -61,15 +69,6 @@ void Map::loadMapFromFile(std::string& path_to_file, std::string file_name,
     if (find_angular_ranges)
         this->computeAngularRanges();
 
-}
-
-inline uint Map::ARR_2D_to_1D(uint i, uint j){
-    return (i * this->mapHeight) + j;
-}
-
-inline void Map::ARR_1D_to_2D(uint n, uint& row, uint& col){
-    row = n / this->mapHeight;
-    col = n % this->mapHeight;
 }
 
 void Map::lowGradient(int x1, int y1, int x2, int y2, Coordinates2D& res)
@@ -91,7 +90,7 @@ void Map::lowGradient(int x1, int y1, int x2, int y2, Coordinates2D& res)
     int incr = (x1 > x2) ? -1 : 1;
 
     for(int i = x1; i <= x2;){
-        if (this->occupancyGridMap[ARRAY_2D_to_1D(i, y, this->mapHeight)].occupancy == 1){
+        if (this->occupancyGridMap[ARR_2D_to_1D(i, y)].occupancy == 1){
             res.x = i;
             res.y = y;
             return;
@@ -126,7 +125,7 @@ void Map::highGradient(int x1, int y1, int x2, int y2, Coordinates2D& res)
     int incr = (y1 > y2) ? -1 : 1;
 
     for(int i = y1; i <= y2;){
-        if (this->occupancyGridMap[ARRAY_2D_to_1D(x, i, this->mapHeight)].occupancy == 1){
+        if (this->occupancyGridMap[ARR_2D_to_1D(x, i)].occupancy == 1){
             res.x = x;
             res.y = i;
             return;
@@ -174,7 +173,7 @@ bool Map::computeAngularRangesThread_func(uint start, uint end){
         if (this->occupancyGridMap[i].occupancy == -1)
             continue;
         phi = 0.0;
-        ARRAY_1D_to_2D(i, this->mapHeight, coords.x, coords.y);
+        ARR_1D_to_2D(i, coords.x, coords.y);
 
         while (phi < DEG2RAD(this->laserBeams)) {
             position = Math::pos_in_2d_array(this->mapWidth, this->mapHeight, coords.x, coords.y, 0.0, phi, 
@@ -228,7 +227,7 @@ void Map::update_image()
 
     for(int i = 0; i < this->mapWidth; i++){
         for(int j = 0; j < this->mapHeight; j++){
-            plot_data[i][j] = this->occupancyGridMap[ARRAY_2D_to_1D(i, j, this->mapHeight)].occupancy;
+            plot_data[i][j] = this->occupancyGridMap[ARR_2D_to_1D(i, j)].occupancy;
         }
     }
 
@@ -243,7 +242,7 @@ void Map::update_image()
 
 bool Map::saveAngularRanges(std::string filename, uint pos_x, uint pos_y){
     std::ofstream outdata;
-    const auto& data = this->occupancyGridMap[ARRAY_2D_to_1D(pos_x, pos_y, this->mapHeight)].expectedRange;
+    const auto& data = this->occupancyGridMap[ARR_2D_to_1D(pos_x, pos_y)].expectedRange;
 
     std::cout << "Saving Angular Ranges..." << std::endl;
     
@@ -266,6 +265,21 @@ bool Map::saveAngularRanges(std::string filename, uint pos_x, uint pos_y){
     outdata.close();
 
     return true;
+}
+
+Pose Map::getPose(uint map_pos_x, uint map_pos_y){
+    Pose pose;
+    pose.x = (map_pos_x - this->refRow) * this->gridCellSize;
+    pose.y = (map_pos_y - this->refCol) * this->gridCellSize;
+
+    return pose;
+}
+
+float Map::getActualRange(uint32_t pos_x, uint32_t pos_y, double angle) {
+    uint index = this->ARR_2D_to_1D(pos_x, pos_y);
+    uint range_index = floor(angle / this->angleIncrement);
+
+    return this->occupancyGridMap[index].expectedRange[range_index];
 }
 
 /* 

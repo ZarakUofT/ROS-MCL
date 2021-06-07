@@ -15,8 +15,8 @@
 
 #define RAD2DEG(rad)((rad) * 180 / M_PI)
 #define DEG2RAD(deg)((deg) * M_PI/180)
-#define ARRAY_2D_to_1D(i, j, mcol)((i * mcol) + j)
-#define ARRAY_1D_to_2D(n, mcol, row, col) {row = n / mcol; col = n % mcol;}
+// #define ARRAY_2D_to_1D(i, j, mcol)((i * mcol) + j)
+// #define ARRAY_1D_to_2D(i, mcol, row, col) {row = i / mcol; col = i % mcol;}
 
 struct Coordinates2D{
     uint x, y;
@@ -280,6 +280,19 @@ double sample_normal_dist(double mean, double sigma)
     // get random number with normal distribution using gen as random source
     return d(gen);
 }
+
+template<typename T>
+void random_integers_in_range(T r1, T r2, T n,std::vector<T>& nums)
+{   
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(r1, r2); // define the range
+
+    for (int i=0; i < n; i++){
+        nums.push_back(distr(gen));
+    }   
+}
+
 }
 
 #endif

@@ -35,7 +35,8 @@ int main(int argc, char **argv)
     auto start = std::chrono::system_clock::now();
     uint64_t secondsElapsed = 0;
 
-    std::shared_ptr<Map> map = std::make_shared<Map>(360, LIDAR_MAX_RANGE, ANGLE_INCREMENT);
+    std::shared_ptr<Map> map = std::make_shared<Map>(360, LIDAR_MAX_RANGE, ANGLE_INCREMENT, 
+                                                    0, 0);
     std::string pathToFile = "/home/zarak/mcl/src/mcl/src";
 
     map->loadMapFromFile(pathToFile, "grid_map.csv", true);

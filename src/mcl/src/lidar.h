@@ -4,13 +4,14 @@
 #include "base.h"
 
 class LidarData{
-    friend class Particle;
 private:
+    
+public:
     float angleInc;
     float rangeMin;
     float rangeMax;
     std::vector<float> ranges;
-public:
+
     LidarData();
     LidarData(float angle_inc, float range_min, float range_max, std::vector<float> _ranges);
     virtual ~LidarData();

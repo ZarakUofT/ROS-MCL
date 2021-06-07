@@ -37,6 +37,11 @@ catkin_add_gtest(math_test src/tests/test_math.cpp)
 
 include_directories(${OpenCV_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
+add_library(mcl
+    src/mcl.h
+    src/mcl.cpp
+)
+
 add_library(particle
     src/particle.h
     src/particle.cpp
@@ -59,7 +64,8 @@ add_library(map
 
 target_link_libraries(map matplot)
 target_link_libraries(particle matplot)
-add_dependencies(particle map odom lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mcl matplot)
+add_dependencies(particle mcl map odom lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add the publisher example
 add_executable(main src/main.cpp)
