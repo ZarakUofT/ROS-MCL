@@ -94,9 +94,9 @@ void Particle::applySensorModel()
     for (int i = 0; i < map->getLaserBeams(); i++) { // make sure we do this based on the recorded data in map
         z_actual = map->getActualRange(this->mapPosX, this->mapPosY, angle);
         zt = this->lidarData->ranges[j];
-        p = this->zHit   * this->computePHit(zt, z_actual) + 
-            this->zShort * this->computePShort(zt)         +
-            this->zMax   * this->computePMax(zt)           +
+        p = this->zHit   * this->computePHit(zt, z_actual)   + 
+            this->zShort * this->computePShort(zt, z_actual) +
+            this->zMax   * this->computePMax(zt)             +
             this->zRand  * this->computePrand(zt);
 
         q *= p;
@@ -106,11 +106,13 @@ void Particle::applySensorModel()
 }
 
 double inline Particle::computePHit(double zt, double zt_actual) {
-    return exp(- ((zt - zt_actual) * (zt - zt_actual)) / (2 * this->sigmaHit * this->sigmaHit));
+    return erf((zt_actual - zt) / (this->sigmaHit * sqrt(2))) * 
+            Math::model_normal_distribution(zt, zt_actual, this->sigmaHit);
 }
 
-double inline Particle::computePShort(double zt){
-    return this->lambdaShort * exp(-this->lambdaShort * zt);
+double inline Particle::computePShort(double zt, double zt_actual){
+    return (1 / (1 - exp(-this->lambdaShort * zt_actual))) * 
+            this->lambdaShort * exp(-this->lambdaShort * zt);
 } 
 
 double inline Particle::computePMax(double zt){

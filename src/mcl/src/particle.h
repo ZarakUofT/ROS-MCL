@@ -34,7 +34,7 @@ public:
     void applySensorModel();
 
     double inline computePHit(double zt, double zt_actual);
-    double inline computePShort(double zt);
+    double inline computePShort(double zt, double zt_actual);
     double inline computePMax(double zt);
     double inline computePrand(double zt);
 

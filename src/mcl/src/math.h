@@ -293,6 +293,12 @@ void random_integers_in_range(T r1, T r2, T n,std::vector<T>& nums)
     }   
 }
 
+template<typename T>
+static inline double model_normal_distribution(T x, T mean, T sigma)
+{
+    return (1 / sqrt(2 * M_PI * sigma * sigma)) * exp(-(pow((x - mean), 2)) / (2 * sigma * sigma));
+}
+
 }
 
 #endif
