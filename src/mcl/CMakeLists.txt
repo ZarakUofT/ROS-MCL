@@ -65,8 +65,8 @@ add_library(map
 target_link_libraries(map matplot)
 target_link_libraries(particle matplot)
 target_link_libraries(mcl matplot)
-add_dependencies(particle mcl map odom lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(mcl particle map odom lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # add the publisher example
 add_executable(main src/main.cpp)
-target_link_libraries(main map matplot particle odom lidar ${catkin_LIBRARIES} ${OpenCV_LIB})
+target_link_libraries(main mcl map matplot particle odom lidar ${catkin_LIBRARIES} ${OpenCV_LIB})

@@ -24,6 +24,46 @@ void MCL::initParticles() {
     for (uint i = 0; i < this->numParticles; i++){
         this->map->ARR_1D_to_2D(rand_nums[i], pos_x, pos_y);
         auto pose = std::make_shared<Pose>(this->map->getPose(pos_x, pos_y));
-        this->particles.push_back(Particle(pose, INITIAL_PARTICLE_WEIGHT, pos_x, pos_y));
+        this->particles.push_back(Particle(pose, 1/this->numParticles, pos_x, pos_y));
+    }
+}
+
+void MCL::update() {
+    std::vector<Particle> tempParticles = this->particles;
+    
+    for (auto& p: tempParticles){
+        p.applyOdomMotionModel();
+        p.applySensorModel();
+    }
+
+    // get weights and normalize
+    std::vector<double> weights;
+    for (int i = 0; i < this->numParticles; i++){
+        weights.push_back(tempParticles[i].getWeight());
+    }
+    Math::normalize_vec(weights);
+    
+    this->lowVarianceResampler(tempParticles, weights);
+}
+
+void MCL::lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector<double>& weights) {
+    std::vector<double> c;
+    Math::cumalitive_vector(weights, c);
+    double r = Math::random_double(0.f, 1 / this->numParticles);
+    double u = 0.f;
+
+    uint i = 1;
+
+    // clear the particles vector since it will be repopulated
+    this->particles.clear();
+    this->particles.reserve(this->numParticles);
+
+    for (size_t m = 1; m <= this->numParticles; m++){
+        u = r + (m - 1) * (1/this->numParticles);
+
+        while(u > c[i]){
+            i++;
+        }
+        this->particles.push_back(tempParticles[i]);
     }
 }

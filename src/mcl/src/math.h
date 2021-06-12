@@ -224,9 +224,46 @@ bool resizeDeq(std::deque<std::deque<T>>& deq, uint16_t resize_by_width, uint16_
     return true;
 }
 
-double normalize(double z)
+inline double normalize(double z)
 {
   return atan2(sin(z),cos(z));
+}
+
+template<typename T>
+double sum(std::vector<T>& vec){
+    double sum = 0.0;
+    for (auto& e: vec){
+        sum += e;
+    }
+    return sum;
+}
+
+template<typename T>
+bool scale(std::vector<T>& vec, double scale){
+    for (auto& e: vec){
+        e *= scale;
+    }
+    return true;
+}
+
+template<typename T>
+bool normalize_vec(std::vector<T>& vec){
+    double summ = sum(vec);
+    if (summ <= 1)
+        return false;
+    return scale(vec, 1 / summ);
+}
+
+
+// c is assumed to be empty
+template<typename T>
+void cumalitive_vector(std::vector<T>& vec, std::vector<T>& c){
+    c.reserve(vec.size());
+    double n = 0.f;
+    for (int i = 0; i < vec.size(); i++){
+        n += vec[i];
+        c.push_back(n);
+    }
 }
 
 // Angle difference in radians
@@ -291,6 +328,10 @@ void random_integers_in_range(T r1, T r2, T n,std::vector<T>& nums)
     for (int i=0; i < n; i++){
         nums.push_back(distr(gen));
     }   
+}
+
+inline double random_double(double x, double y){
+    return x + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(y-x)));
 }
 
 template<typename T>

@@ -1,10 +1,13 @@
 #include "particle.h"
 
 Particle::Particle(double _weight) 
-    : pose(std::make_shared<Pose>()), mapPosX(0), mapPosY(0), weight(_weight){}
+    : pose(std::make_shared<Pose>()), mapPosX(0), mapPosY(0), weight(_weight)
+{
+}
 
 Particle::Particle(std::shared_ptr<Pose> _pose, double _weight, uint32_t map_pos_x, uint32_t map_pos_y) 
-    : pose(_pose), mapPosX(map_pos_x), mapPosY(map_pos_y), weight(_weight){
+    : pose(_pose), mapPosX(map_pos_x), mapPosY(map_pos_y), weight(_weight)
+{
 }
 
 Particle::~Particle() 
@@ -15,29 +18,29 @@ Particle::~Particle()
 void Particle::setStatics(const std::shared_ptr<OdomData> odom_data, const std::shared_ptr<LidarData> lidar_data,
                           const std::shared_ptr<Map> _map) 
 {
-    odomData = odom_data;
-    lidarData = lidar_data;
-    map = _map;
+    Particle::odomData = odom_data;
+    Particle::lidarData = lidar_data;
+    Particle::map = _map;
 }
 
 void Particle::setOdomModel(double a1, double a2, double a3, double a4) 
 {
-    alpha1 = a1;
-    alpha2 = a2;
-    alpha3 = a3;
-    alpha4 = a4;
+    Particle::alpha1 = a1;
+    Particle::alpha2 = a2;
+    Particle::alpha3 = a3;
+    Particle::alpha4 = a4;
 }
 
 void Particle::setBeamModel(double z_hit, double z_max, double z_short, double z_rand, 
                             double sigma_hit, double lambda_short, double chi_outlier)
 {
-    zHit = z_hit;
-    zMax = z_max;
-    zShort = z_short;
-    zRand = z_rand;
-    sigmaHit = sigma_hit;
-    lambdaShort = lambda_short;
-    chiOutlier = chi_outlier;
+    Particle::zHit = z_hit;
+    Particle::zMax = z_max;
+    Particle::zShort = z_short;
+    Particle::zRand = z_rand;
+    Particle::sigmaHit = sigma_hit;
+    Particle::lambdaShort = lambda_short;
+    Particle::chiOutlier = chi_outlier;
 }
 
 void Particle::update() 

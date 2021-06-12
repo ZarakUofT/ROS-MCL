@@ -12,14 +12,16 @@ typedef struct odom{
 
 class OdomData{
 private:
-
+    ros::NodeHandle& nh;
+    ros::Subscriber odomSuscriber;
 public:
     std::shared_ptr<odom_t> delta;
     std::shared_ptr<odom_t> currOdom;
 
-    OdomData();
-    OdomData(std::shared_ptr<odom_t> curr_odom);
-    OdomData(std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> currOdom);
+    OdomData(ros::NodeHandle& n);
+    OdomData(ros::NodeHandle& n, std::shared_ptr<odom_t> curr_odom);
+    OdomData(ros::NodeHandle& n, 
+            std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> currOdom);
     virtual ~OdomData();
 
     void callback(const nav_msgs::Odometry::ConstPtr & msg);

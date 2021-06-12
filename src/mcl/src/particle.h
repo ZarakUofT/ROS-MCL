@@ -17,6 +17,14 @@ private:
     static std::shared_ptr<Map> map; // all particles share the same map
     static double alpha1, alpha2, alpha3, alpha4;
     static double zHit, zMax, zShort, zRand, sigmaHit, lambdaShort, chiOutlier;
+
+    //private functions
+    double inline computePHit(double zt, double zt_actual);
+    double inline computePShort(double zt, double zt_actual);
+    double inline computePMax(double zt);
+    double inline computePrand(double zt);
+
+    static void init_static_vars();
 public:
     Particle(double weight);
     Particle(std::shared_ptr<Pose> _pose, double weight, uint map_pos_x, uint map_pos_y);
@@ -33,15 +41,28 @@ public:
     void applyOdomMotionModel();
     void applySensorModel();
 
-    double inline computePHit(double zt, double zt_actual);
-    double inline computePShort(double zt, double zt_actual);
-    double inline computePMax(double zt);
-    double inline computePrand(double zt);
-
     // getter funcs
     const std::shared_ptr<Pose> inline getPose() const {return this->pose;}
     std::pair<uint32_t, uint32_t> inline getMapPos() {return std::make_pair(this->mapPosX, this->mapPosY);}
     double inline getWeight() const {return this->weight;}
 
 };
+
+//Initializing Class Static Vars
+double Particle::alpha1 = 0.f;
+double Particle::alpha2 = 0.f;
+double Particle::alpha3 = 0.f;
+double Particle::alpha4 = 0.f;
+
+double Particle::zHit = 0.f;
+double Particle::zMax = 0.f;
+double Particle::zShort = 0.f;
+double Particle::zRand = 0.f;
+double Particle::sigmaHit = 0.f;
+double Particle::lambdaShort = 0.f;
+double Particle::chiOutlier = 0.f;
+
+std::shared_ptr<OdomData> Particle::odomData = nullptr;
+std::shared_ptr<LidarData> Particle::lidarData = nullptr;
+std::shared_ptr<Map> Particle::map = nullptr;
 #endif // __PARTICLE_H__

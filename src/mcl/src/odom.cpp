@@ -1,19 +1,28 @@
 #include "odom.h"
 
-OdomData::OdomData()
+OdomData::OdomData(ros::NodeHandle& n)
+    : nh(n)    
 {
     this->delta = std::make_shared<odom_t> (0.0, 0.0, 0.0);
     this->currOdom = std::make_shared<odom_t> (0.0, 0.0, 0.0);
+
+    this->odomSuscriber = this->nh.subscribe("odom", 10, &OdomData::callback, this);
 }
 
-OdomData::OdomData(std::shared_ptr<odom_t> curr_odom) 
-    : currOdom(curr_odom)
+OdomData::OdomData(ros::NodeHandle& n, std::shared_ptr<odom_t> curr_odom) 
+    : nh(n), currOdom(curr_odom)
 {
     this->delta = std::make_shared<odom_t> (0.0, 0.0, 0.0);
+
+    this->odomSuscriber = this->nh.subscribe("odom", 10, &OdomData::callback, this);
 }
 
-OdomData::OdomData(std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> curr_odom) 
-    : delta(delt), currOdom(curr_odom){}
+OdomData::OdomData(ros::NodeHandle& n,
+        std::shared_ptr<odom_t> delt, std::shared_ptr<odom_t> curr_odom) 
+    : nh(n), delta(delt), currOdom(curr_odom)
+{
+    this->odomSuscriber = this->nh.subscribe("odom", 10, &OdomData::callback, this);
+}
 
 OdomData::~OdomData() {}
 

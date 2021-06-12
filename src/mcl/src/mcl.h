@@ -3,7 +3,6 @@
 
 #include "particle.h"
 
-const double INITIAL_PARTICLE_WEIGHT = 0.5;
 const double ALPHA1      =  0.2;
 const double ALPHA2      =  0.2;
 const double ALPHA3      =  0.2;
@@ -30,6 +29,10 @@ public:
     virtual ~MCL();
 
     void initParticles();
+
+    void update();
+
+    void lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector<double>& weights);
 };
 
 #endif // __MCL_H__
