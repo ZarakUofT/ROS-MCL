@@ -23,16 +23,23 @@ private:
     std::shared_ptr<OdomData> odomData;
     std::shared_ptr<LidarData> lidarData;
     std::shared_ptr<Map> map;
+
+    //figure stuff
+    figure_handle figure;
+    axes_handle axes;
 public:
     MCL(uint num_particles, std::shared_ptr<OdomData> odom_data, 
         std::shared_ptr<LidarData> lidar_data, std::shared_ptr<Map> _map);
     virtual ~MCL();
 
     void initParticles();
+    void initFigure();
 
     void update();
 
     void lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector<double>& weights);
+
+    void draw();
 };
 
 #endif // __MCL_H__

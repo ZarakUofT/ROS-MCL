@@ -43,7 +43,7 @@ public:
 
     // getter funcs
     const std::shared_ptr<Pose> inline getPose() const {return this->pose;}
-    std::pair<uint32_t, uint32_t> inline getMapPos() {return std::make_pair(this->mapPosX, this->mapPosY);}
+    const std::pair<uint, uint> inline getMapPos() {return std::make_pair(this->mapPosX, this->mapPosY);}
     double inline getWeight() const {return this->weight;}
 
 };

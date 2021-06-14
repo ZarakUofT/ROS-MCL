@@ -2,7 +2,9 @@
 
 MCL::MCL(uint num_particles, std::shared_ptr<OdomData> odom_data, 
         std::shared_ptr<LidarData> lidar_data, std::shared_ptr<Map> _map) 
-    : numParticles(num_particles), particles({}), odomData(odom_data), lidarData(lidar_data), map(_map){
+    : numParticles(num_particles), particles({}), odomData(odom_data), lidarData(lidar_data), map(_map)
+{
+    this->initFigure();
     this->initParticles();
 }
 
@@ -26,6 +28,13 @@ void MCL::initParticles() {
         auto pose = std::make_shared<Pose>(this->map->getPose(pos_x, pos_y));
         this->particles.push_back(Particle(pose, 1/this->numParticles, pos_x, pos_y));
     }
+}
+
+void MCL::initFigure() {
+    this->figure = matplot::figure();
+    this->figure->ioff();
+    this->axes = matplot::axes(this->figure);
+    // this->axes->grid(false);
 }
 
 void MCL::update() {
@@ -67,3 +76,25 @@ void MCL::lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector
         this->particles.push_back(tempParticles[i]);
     }
 }
+
+void MCL::draw() {
+    // figure_handle figure = map->getFigure();
+    // axes_handle newAxes = figure->add_axes(false);
+    std::vector<uint> x;
+    std::vector<uint> y;
+    std::vector<uint> size;
+    std::vector<matplot::color> color;
+
+    for (auto &p:particles){
+        std::pair<uint32_t, uint32_t> pos = p.getMapPos();
+        x.push_back(pos.first);
+        y.push_back(pos.second);
+        size.push_back(10.0);
+        color.push_back(matplot::color::green);
+    }
+
+    this->axes->x_axis().limits({0.0, static_cast<double>(this->map->getMapWidth())});
+    this->axes->y_axis().limits({0.0, static_cast<double>(this->map->getMapHeight())});
+    this->axes->scatter(x, y, size, color);
+    this->axes->draw();
+}   

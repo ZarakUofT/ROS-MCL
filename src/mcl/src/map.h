@@ -19,7 +19,6 @@ struct Pose{
 typedef struct grid_cell{
     int8_t occupancy; // 0=empty, 1=occupied, -1=unknown
     std::vector<float> expectedRange; // don't have to compute this in realtime when applying sensor model
-                                       // Increments of 2 degrees
     grid_cell()
         : occupancy(-1), expectedRange({}){}
     grid_cell(int occ)
@@ -84,7 +83,7 @@ public:
     Pose getPose(uint map_pos_x, uint map_pos_y);
 
     // Getters / Accessors
-    float getActualRange(uint32_t pos_x, uint32_t pos_y, double angle);
+    float getActualRange(uint pos_x, uint pos_y, double angle);
     const inline uint16_t getLaserBeams() const { return this->laserBeams;}
     const inline double getMaxRange() const {return this->rangeSensorMaxRange;}
     const inline double getSensorAngleIcr() const {return this->rangeSensorAngleIncrement;}
@@ -96,6 +95,9 @@ public:
     const inline uint getMapSize() const {return this->occupancyGridMap.size();}
     const inline uint getRefRow() const {return this->refRow;}
     const inline uint getRefCol() const {return this->refCol;}
+    const inline double getGridCellSize() const {return this->gridCellSize;}
+    inline figure_handle getFigure() const {return this->figure;}
+    inline axes_handle getAxes() const {return this->axes;}
 };
 
 // Prototypes for functions

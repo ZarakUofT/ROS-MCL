@@ -56,7 +56,7 @@ void Particle::applyOdomMotionModel()
 
     delta_rot1 = Math::angle_diff(atan2(this->odomData->delta->y, this->odomData->delta->x), this->odomData->currOdom->yaw);
     delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
-    delta_rot2 = Math::angle_diff(Math::angle_diff(this->odomData->currOdom->yaw, this->odomData->currOdom->yaw), delta_rot1);
+    delta_rot2 = Math::angle_diff(this->odomData->delta->yaw, delta_rot1);
 
     delta_rot1_hat = Math::angle_diff(delta_rot1,
                      Math::sample_normal_dist(0, this->alpha1 * delta_rot1 + 
@@ -72,6 +72,8 @@ void Particle::applyOdomMotionModel()
     this->pose->x += delta_trans_hat * cos(this->pose->yaw + delta_rot1_hat);
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
     this->pose->yaw += delta_rot1_hat + delta_rot2_hat;
+
+    this->pose->yaw = Math::angle_proper_range(this->pose->yaw);
 
     // determine position of the 2D grip map
     int row, col;
@@ -95,7 +97,7 @@ void Particle::applySensorModel()
     
     // Note: the following computations do not get normalized, might run into issues later
     for (int i = 0; i < map->getLaserBeams(); i++) { // make sure we do this based on the recorded data in map
-        z_actual = map->getActualRange(this->mapPosX, this->mapPosY, angle);
+        z_actual = map->getActualRange(this->mapPosX, this->mapPosY, Math::angle_proper_range(Math::normalize(angle)));
         zt = this->lidarData->ranges[j];
         p = this->zHit   * this->computePHit(zt, z_actual)   + 
             this->zShort * this->computePShort(zt, z_actual) +
@@ -103,7 +105,7 @@ void Particle::applySensorModel()
             this->zRand  * this->computePrand(zt);
 
         q *= p;
-        angle =+ map->getAngleIcr();
+        angle =+ map->getSensorAngleIcr();
     }
     this->weight = q;
 }

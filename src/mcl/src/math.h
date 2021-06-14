@@ -282,6 +282,11 @@ double angle_diff(double a, double b)
     return(d2);
 }
 
+// puts the angle in range 0 - 2 PI
+inline double angle_proper_range(double a){
+    return (a < 0.0) ? (a + 2 * M_PI) : a;
+}
+
 // Draw randomly from a zero-mean Gaussian distribution, with standard
 // deviation sigma.
 // We use the polar form of the Box-Muller transformation, explained here:

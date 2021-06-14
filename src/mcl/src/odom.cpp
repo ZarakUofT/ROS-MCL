@@ -32,7 +32,7 @@ void OdomData::callback(const nav_msgs::Odometry::ConstPtr & msg)
     x = msg->pose.pose.position.x;
     y = msg->pose.pose.position.y;
     yaw = tf::getYaw(msg->pose.pose.orientation);
-    yaw = (yaw < 0.0) ? (yaw + 2 * M_PI) : yaw;
+    yaw = Math::angle_proper_range(yaw);
 
     // compute delta
     this->delta->x = x - this->currOdom->x;

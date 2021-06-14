@@ -170,8 +170,10 @@ bool Map::computeAngularRangesThread_func(uint start, uint end){
     double dist;
 
     for (int i = start; i < end; i++) {
-        if (this->occupancyGridMap[i].occupancy == -1)
+        if (this->occupancyGridMap[i].occupancy == -1){
+            this->occupancyGridMap[i].expectedRange = std::vector<float>(this->laserBeams);
             continue;
+        }
         phi = 0.0;
         ARR_1D_to_2D(i, coords.x, coords.y);
 
@@ -269,15 +271,19 @@ bool Map::saveAngularRanges(std::string filename, uint pos_x, uint pos_y){
 
 Pose Map::getPose(uint map_pos_x, uint map_pos_y){
     Pose pose;
-    pose.x = (map_pos_x - this->refRow) * this->gridCellSize;
-    pose.y = (map_pos_y - this->refCol) * this->gridCellSize;
+    pose.x = (static_cast<int>(map_pos_x) - static_cast<int>(this->refRow)) * this->gridCellSize;
+    pose.y = (static_cast<int>(map_pos_y) - static_cast<int>(this->refCol)) * this->gridCellSize;
 
     return pose;
 }
 
-float Map::getActualRange(uint32_t pos_x, uint32_t pos_y, double angle) {
+float Map::getActualRange(uint pos_x, uint pos_y, double angle) {
     uint index = this->ARR_2D_to_1D(pos_x, pos_y);
     uint range_index = floor(angle / this->angleIncrement);
+
+    std::cout << angle << std::endl;
+    std::cout << index << ", " << range_index << std::endl;
+    std::cout << pos_x << ", " << pos_y << std::endl;
 
     return this->occupancyGridMap[index].expectedRange[range_index];
 }
