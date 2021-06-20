@@ -24,6 +24,9 @@ private:
     double inline computePMax(double zt);
     double inline computePrand(double zt);
 
+    void applyOdomMotionModel();
+    void applySensorModel();
+
     static void init_static_vars();
 public:
     Particle(double weight);
@@ -38,8 +41,6 @@ public:
     
     // Update funcs
     void update();
-    void applyOdomMotionModel();
-    void applySensorModel();
 
     // getter funcs
     const std::shared_ptr<Pose> inline getPose() const {return this->pose;}

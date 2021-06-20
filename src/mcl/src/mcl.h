@@ -27,6 +27,11 @@ private:
     //figure stuff
     figure_handle figure;
     axes_handle axes;
+
+    // Held for plotting for graph on a different thread
+    std::future<bool> futurePlotThread;
+    bool stillPlotting;
+    bool threadCreatedForPlotting;
 public:
     MCL(uint num_particles, std::shared_ptr<OdomData> odom_data, 
         std::shared_ptr<LidarData> lidar_data, std::shared_ptr<Map> _map);
@@ -39,7 +44,10 @@ public:
 
     void lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector<double>& weights);
 
-    void draw();
+    void update_graph();
 };
+
+bool draw(std::shared_ptr<std::vector<uint>> x, std::shared_ptr<std::vector<uint>> y, axes_handle& axes,
+            std::shared_ptr<std::vector<uint>> size, std::shared_ptr<std::vector<matplot::color>> color);
 
 #endif // __MCL_H__

@@ -69,17 +69,23 @@ void Particle::applyOdomMotionModel()
                      Math::sample_normal_dist(0, this->alpha1 * delta_rot2 + 
                             this->alpha2 * delta_trans));
 
+    // std::cout << "x_B: " << this->pose->x << ", y_B: " << this->pose->y << 
+                // ", yaw_B: " << this->pose->yaw << std::endl;
     this->pose->x += delta_trans_hat * cos(this->pose->yaw + delta_rot1_hat);
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
     this->pose->yaw += delta_rot1_hat + delta_rot2_hat;
 
     this->pose->yaw = Math::angle_proper_range(this->pose->yaw);
 
+    // std::cout << "x: " << this->pose->x << ", y: " << this->pose->y << 
+    //             ", yaw: " << this->pose->yaw << std::endl;
+    // std::cout << std::endl;
+
     // determine position of the 2D grip map
     int row, col;
 
     row = this->map->getRefRow() + static_cast<int>(this->pose->x / Particle::map->getCellSize());
-    col = this->map->getRefCol() + static_cast<int>(this->pose->y / Particle::map->getCellSize());
+    col = this->map->getRefCol() + static_cast<int>(this->pose->y / Particle::map->getCellSize()); 
 
     // make sure this doesn't exceed the map size???
     this->mapPosX = (row >= 0) ? row : 0;
@@ -88,16 +94,18 @@ void Particle::applyOdomMotionModel()
 
 void Particle::applySensorModel() 
 {
-    double q  = 1.0;
-    double p = 0.0;
-    double zt = 0.0;
+    double q  = 1.f;
+    double p = 0.f;
+    double zt = 0.f;
     int j = 0;
-    double z_actual = 0.0;
+    double z_actual = 0.f;
     double angle = this->pose->yaw;
-    
+
     // Note: the following computations do not get normalized, might run into issues later
     for (int i = 0; i < map->getLaserBeams(); i++) { // make sure we do this based on the recorded data in map
-        z_actual = map->getActualRange(this->mapPosX, this->mapPosY, Math::angle_proper_range(Math::normalize(angle)));
+        // std::cout << "HELLO" << std::endl;      
+        z_actual = map->getActualRange(this->mapPosX, this->mapPosY, Math::angle_proper_range(angle));  
+        // std::cout << "z_actual: " << z_actual << std::endl;
         zt = this->lidarData->ranges[j];
         p = this->zHit   * this->computePHit(zt, z_actual)   + 
             this->zShort * this->computePShort(zt, z_actual) +
@@ -108,6 +116,7 @@ void Particle::applySensorModel()
         angle =+ map->getSensorAngleIcr();
     }
     this->weight = q;
+    // std::cout << "End of func" << std::endl;
 }
 
 double inline Particle::computePHit(double zt, double zt_actual) {

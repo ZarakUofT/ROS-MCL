@@ -281,9 +281,9 @@ float Map::getActualRange(uint pos_x, uint pos_y, double angle) {
     uint index = this->ARR_2D_to_1D(pos_x, pos_y);
     uint range_index = floor(angle / this->angleIncrement);
 
-    std::cout << angle << std::endl;
-    std::cout << index << ", " << range_index << std::endl;
-    std::cout << pos_x << ", " << pos_y << std::endl;
+    // std::cout << angle << std::endl;
+    // std::cout << index << ", " << range_index << std::endl;
+    // std::cout << pos_x << ", " << pos_y << std::endl;
 
     return this->occupancyGridMap[index].expectedRange[range_index];
 }

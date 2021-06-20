@@ -249,7 +249,7 @@ bool scale(std::vector<T>& vec, double scale){
 template<typename T>
 bool normalize_vec(std::vector<T>& vec){
     double summ = sum(vec);
-    if (summ <= 1)
+    if (summ <= 0)
         return false;
     return scale(vec, 1 / summ);
 }
@@ -284,6 +284,7 @@ double angle_diff(double a, double b)
 
 // puts the angle in range 0 - 2 PI
 inline double angle_proper_range(double a){
+    a = normalize(a);
     return (a < 0.0) ? (a + 2 * M_PI) : a;
 }
 

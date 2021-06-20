@@ -5,9 +5,9 @@
 //Global Variables
 const double LIDAR_MAX_RANGE = 3.5; // in meters
 const double ANGLE_INCREMENT = 0.017501922324299812;
-const int MAP_RENDER_CYCLE = 5;
+const int MAP_RENDER_CYCLE = 2;
 
-const uint NUM_PARTICLES = 20;
+const uint NUM_PARTICLES = 2;
 
 int main(int argc, char **argv)
 {
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         mcl->update();
         if (secondsElapsed > MAP_RENDER_CYCLE){
             // Render Particle filter at some point
-            mcl->draw();
+            // mcl->update_graph();
             start = std::chrono::system_clock::now();
         }
         loop_rate.sleep();
