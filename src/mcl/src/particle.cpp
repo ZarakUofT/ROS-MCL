@@ -94,8 +94,11 @@ void Particle::applyOdomMotionModel(double delta_rot1, double delta_trans, doubl
     std::cout << row << ", " << col << std::endl;
 
     // make sure this doesn't exceed the map size???
+    std::pair<uint, uint> map_dims = this->map->getMapDims();
     this->mapPosX = (row >= 0) ? row : 0;
+    this->mapPosX = (row < map_dims.first) ? row : map_dims.first;
     this->mapPosY = (col >= 0) ? col : 0;
+    this->mapPosY = (col < map_dims.second)? col : map_dims.second;
 }
 
 void Particle::applySensorModel() 
