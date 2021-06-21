@@ -40,14 +40,39 @@ void MCL::initFigure() {
     // this->axes->grid(false);
 }
 
+void MCL::computeParticleRots(double& delta_rot1, double& delta_trans, double& delta_rot2, 
+                            double& delta_rot1_noise, double& delta_rot2_noise)
+{
+    if (sqrt(pow(this->odomData->delta->x, 2) + pow(this->odomData->delta->y, 2)) < MIN_DIST) {
+        delta_rot1 = 0.f;
+    }else{
+        delta_rot1 = Math::angle_diff(atan2(this->odomData->delta->y, this->odomData->delta->x), 
+                        this->odomData->currOdom->yaw);
+    }
+    delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
+    delta_rot2 = Math::angle_diff(this->odomData->delta->yaw, delta_rot1);
+
+    // We want to treat backward and forward motion symmetrically for the
+    // noise model to be applied below.
+    delta_rot1_noise = std::min(fabs(Math::angle_diff(delta_rot1, 0.0)),
+                                fabs(Math::angle_diff(delta_rot1, M_PI)));
+    delta_rot2_noise = std::min(fabs(Math::angle_diff(delta_rot2, 0.0)),
+                                fabs(Math::angle_diff(delta_rot2, M_PI)));
+}
+
 void MCL::update() {
     std::vector<Particle> tempParticles = this->particles;
+
+    double delta_rot1, delta_trans, delta_rot2;
+    double delta_rot1_noise, delta_rot2_noise;
+
+    this->computeParticleRots(delta_rot1, delta_trans, delta_rot2, delta_rot1_noise, delta_rot2_noise);
     
     for (auto& p: tempParticles) {
         // std::cout << "x_A: " << odomData->currOdom->x << ", y_A: " << odomData->currOdom->y << 
         //             ", yaw_A: " << odomData->currOdom->yaw << std::endl;
         // std::cout << "x: " << p.getPose()->x << ", y: " << p.getPose()->y << ", yaw: " << p.getPose()->yaw << std::endl;
-        p.update();
+        p.update(delta_rot1, delta_trans, delta_rot2, delta_rot1_noise, delta_rot2_noise);
     }
 
     // get weights and normalize
@@ -68,6 +93,11 @@ void MCL::lowVarianceResampler(std::vector<Particle>& tempParticles, std::vector
     double u = 0.f;
 
     uint i = 0;
+
+    // for (auto& w: weights){
+    //     std::cout << w << ", ";
+    // }
+    // std::cout << std::endl;
 
     // clear the particles vector since it will be repopulated
     this->particles.clear();

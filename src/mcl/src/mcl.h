@@ -14,6 +14,7 @@ const double ZRAND       =  0.05;
 const double SIGMAHIT    =  0.2;
 const double LAMBDASHORT =  0.1;
 const double CHIOUTLIER  =  0.1;
+const double MIN_DIST    = 0.01;
 
 class MCL{
 private:
@@ -32,6 +33,10 @@ private:
     std::future<bool> futurePlotThread;
     bool stillPlotting;
     bool threadCreatedForPlotting;
+
+    // private funcs
+    void computeParticleRots(double& delta_rot1, double& delta_trans, double& delta_rot2, 
+                            double& delta_rot1_noise, double& delta_rot2_noise);
 public:
     MCL(uint num_particles, std::shared_ptr<OdomData> odom_data, 
         std::shared_ptr<LidarData> lidar_data, std::shared_ptr<Map> _map);

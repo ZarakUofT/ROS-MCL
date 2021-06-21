@@ -43,31 +43,32 @@ void Particle::setBeamModel(double z_hit, double z_max, double z_short, double z
     Particle::chiOutlier = chi_outlier;
 }
 
-void Particle::update() 
+void Particle::update(double delta_rot1, double delta_trans, double delta_rot2, 
+                    double delta_rot1_noise, double delta_rot2_noise) 
 {
-    this->applyOdomMotionModel();
+    this->applyOdomMotionModel(delta_rot1, delta_trans, delta_rot2, delta_rot1_noise, delta_rot2_noise);
     this->applySensorModel();
 }
 
-void Particle::applyOdomMotionModel() 
+void Particle::applyOdomMotionModel(double delta_rot1, double delta_trans, double delta_rot2, 
+                                    double delta_rot1_noise, double delta_rot2_noise) 
 {    
-    double delta_rot1, delta_trans, delta_rot2;
     double delta_rot1_hat, delta_trans_hat, delta_rot2_hat;
 
-    delta_rot1 = Math::angle_diff(atan2(this->odomData->delta->y, this->odomData->delta->x), this->odomData->currOdom->yaw);
-    delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
-    delta_rot2 = Math::angle_diff(this->odomData->delta->yaw, delta_rot1);
-
     delta_rot1_hat = Math::angle_diff(delta_rot1,
-                     Math::sample_normal_dist(0, this->alpha1 * delta_rot1 + 
-                            this->alpha2 * delta_trans));
+                     Math::sample_gaussian_dist(sqrt(this->alpha1*delta_rot1_noise*delta_rot1_noise + 
+                            this->alpha2 * delta_trans * delta_trans)));
     delta_trans_hat = delta_trans - 
-                      Math::sample_normal_dist(0, this->alpha3*delta_trans +
-                            this->alpha4*delta_rot1 +
-                            this->alpha4*delta_rot2);
+                      Math::sample_gaussian_dist(sqrt(this->alpha3*delta_trans*delta_trans +
+                            this->alpha4*delta_rot1_noise*delta_rot1_noise +
+                            this->alpha4*delta_rot2_noise*delta_rot2_noise));
     delta_rot2_hat = Math::angle_diff(delta_rot2,
-                     Math::sample_normal_dist(0, this->alpha1 * delta_rot2 + 
-                            this->alpha2 * delta_trans));
+                     Math::sample_gaussian_dist(sqrt(this->alpha1*delta_rot2_noise*delta_rot2_noise + 
+                            this->alpha2*delta_trans*delta_trans)));
+    // std::cout << "rot2: " << Math::sample_gaussian_dist(sqrt(this->alpha1*delta_rot1_noise*delta_rot1_noise + 
+    //                         this->alpha2 * delta_trans * delta_trans)) << 
+    //              " rot1: " << Math::sample_gaussian_dist(sqrt(this->alpha1*delta_rot1_noise*delta_rot1_noise + 
+    //                         this->alpha2 * delta_trans * delta_trans)) << std::endl;
 
     // std::cout << "x_B: " << this->pose->x << ", y_B: " << this->pose->y << 
                 // ", yaw_B: " << this->pose->yaw << std::endl;
@@ -75,7 +76,7 @@ void Particle::applyOdomMotionModel()
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
     this->pose->yaw += delta_rot1_hat + delta_rot2_hat;
 
-    this->pose->yaw = Math::angle_proper_range(this->pose->yaw);
+    this->pose->yaw = Math::normalize(this->pose->yaw);
 
     // std::cout << "x: " << this->pose->x << ", y: " << this->pose->y << 
     //             ", yaw: " << this->pose->yaw << std::endl;
@@ -86,6 +87,11 @@ void Particle::applyOdomMotionModel()
 
     row = this->map->getRefRow() + static_cast<int>(this->pose->x / Particle::map->getCellSize());
     col = this->map->getRefCol() + static_cast<int>(this->pose->y / Particle::map->getCellSize()); 
+
+    // std::cout << this->odomData->currOdom->x << ", " << this->odomData->currOdom->y  << ", "  << this->odomData->currOdom->yaw << std::endl;
+    // std::cout << this->odomData->delta->x << ", " << this->odomData->delta->y  << ", "  << this->odomData->delta->yaw << std::endl;
+    std::cout << this->pose->x << ", " << this->pose->y << ", "  << this->pose->yaw << std::endl;
+    std::cout << row << ", " << col << std::endl;
 
     // make sure this doesn't exceed the map size???
     this->mapPosX = (row >= 0) ? row : 0;
@@ -106,7 +112,7 @@ void Particle::applySensorModel()
         // std::cout << "HELLO" << std::endl;      
         z_actual = map->getActualRange(this->mapPosX, this->mapPosY, Math::angle_proper_range(angle));  
         // std::cout << "z_actual: " << z_actual << std::endl;
-        zt = this->lidarData->ranges[j];
+        zt = this->lidarData->ranges[i];
         p = this->zHit   * this->computePHit(zt, z_actual)   + 
             this->zShort * this->computePShort(zt, z_actual) +
             this->zMax   * this->computePMax(zt)             +

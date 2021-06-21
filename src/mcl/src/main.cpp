@@ -7,7 +7,7 @@ const double LIDAR_MAX_RANGE = 3.5; // in meters
 const double ANGLE_INCREMENT = 0.017501922324299812;
 const int MAP_RENDER_CYCLE = 2;
 
-const uint NUM_PARTICLES = 2;
+const uint NUM_PARTICLES = 10;
 
 int main(int argc, char **argv)
 {

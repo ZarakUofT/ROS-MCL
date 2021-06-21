@@ -24,7 +24,8 @@ private:
     double inline computePMax(double zt);
     double inline computePrand(double zt);
 
-    void applyOdomMotionModel();
+    void applyOdomMotionModel(double delta_rot1, double delta_trans, double delta_rot2, 
+                              double delta_rot1_noise, double delta_rot2_noise);
     void applySensorModel();
 
     static void init_static_vars();
@@ -40,7 +41,8 @@ public:
                             double sigma_hit, double lambda_short, double chi_outlier);
     
     // Update funcs
-    void update();
+    void update(double delta_rot1, double delta_trans, double delta_rot2, 
+                double delta_rot1_noise, double delta_rot2_noise);
 
     // getter funcs
     const std::shared_ptr<Pose> inline getPose() const {return this->pose;}
@@ -62,6 +64,7 @@ double Particle::zRand = 0.f;
 double Particle::sigmaHit = 0.f;
 double Particle::lambdaShort = 0.f;
 double Particle::chiOutlier = 0.f;
+
 
 std::shared_ptr<OdomData> Particle::odomData = nullptr;
 std::shared_ptr<LidarData> Particle::lidarData = nullptr;
