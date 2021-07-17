@@ -14,6 +14,8 @@ struct Pose{
         :x(0.f), y(0.f), yaw(0.f){}
     Pose(double pos_x, double pos_y, double yaw)
         :x(pos_x), y(pos_y), yaw(yaw){}
+    Pose(const Pose &p) 
+        :x(p.x), y(p.y), yaw(p.yaw) {}
 };
 
 typedef struct grid_cell{
@@ -70,7 +72,7 @@ public:
     
     virtual ~Map();
 
-    void loadMapFromFile(std::string& path_to_file, std::string file_name, bool find_angular_ranges=false);
+    void loadMapFromFile(std::string file_name, bool find_angular_ranges=false);
 
     inline uint ARR_2D_to_1D(uint i, uint j) {return (i * this->mapHeight) + j;}
     inline void ARR_1D_to_2D(uint n, uint& row, uint& col){row = n / this->mapHeight;col = n % this->mapHeight;}

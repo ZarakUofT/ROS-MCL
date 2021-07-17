@@ -14,7 +14,7 @@ const double ZRAND       =  0.05;
 const double SIGMAHIT    =  0.2;
 const double LAMBDASHORT =  0.1;
 const double CHIOUTLIER  =  0.1;
-const double MIN_DIST    = 0.01;
+const double MIN_DIST    = 0.05;
 
 class MCL{
 private:

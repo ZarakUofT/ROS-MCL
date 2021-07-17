@@ -43,20 +43,21 @@ void MCL::initFigure() {
 void MCL::computeParticleRots(double& delta_rot1, double& delta_trans, double& delta_rot2, 
                             double& delta_rot1_noise, double& delta_rot2_noise)
 {
-    if (sqrt(pow(this->odomData->delta->x, 2) + pow(this->odomData->delta->y, 2)) < MIN_DIST) {
+    delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
+
+    if (delta_trans < MIN_DIST) {
         delta_rot1 = 0.f;
-    }else{
+    }else {
         delta_rot1 = Math::angle_diff(atan2(this->odomData->delta->y, this->odomData->delta->x), 
                         this->odomData->currOdom->yaw);
     }
-    delta_trans = sqrt(pow((this->odomData->delta->x), 2) + pow((this->odomData->delta->y), 2));
     delta_rot2 = Math::angle_diff(this->odomData->delta->yaw, delta_rot1);
 
     // We want to treat backward and forward motion symmetrically for the
     // noise model to be applied below.
-    delta_rot1_noise = std::min(fabs(Math::angle_diff(delta_rot1, 0.0)),
+    delta_rot1_noise = std::min(fabs(Math::angle_diff(delta_rot1, 0.f)),
                                 fabs(Math::angle_diff(delta_rot1, M_PI)));
-    delta_rot2_noise = std::min(fabs(Math::angle_diff(delta_rot2, 0.0)),
+    delta_rot2_noise = std::min(fabs(Math::angle_diff(delta_rot2, 0.f)),
                                 fabs(Math::angle_diff(delta_rot2, M_PI)));
 }
 
@@ -76,9 +77,9 @@ void MCL::update() {
     }
 
     // get weights and normalize
-    std::vector<double> weights;
+    static std::vector<double> weights (this->numParticles);
     for (int i = 0; i < this->numParticles; i++){
-        weights.push_back(tempParticles[i].getWeight());
+        weights[i] = tempParticles[i].getWeight();
     }
     Math::normalize_vec(weights);
 

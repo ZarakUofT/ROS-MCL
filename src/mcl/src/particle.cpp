@@ -15,6 +15,12 @@ Particle::~Particle()
     
 }
 
+//Copy constructor
+Particle::Particle(const Particle& p) 
+    : pose(std::make_shared<Pose>(*p.pose)), mapPosX(p.mapPosX), mapPosY(p.mapPosY), weight(p.weight) 
+{
+}
+
 void Particle::setStatics(const std::shared_ptr<OdomData> odom_data, const std::shared_ptr<LidarData> lidar_data,
                           const std::shared_ptr<Map> _map) 
 {
@@ -55,7 +61,7 @@ void Particle::applyOdomMotionModel(double delta_rot1, double delta_trans, doubl
 {    
     double delta_rot1_hat, delta_trans_hat, delta_rot2_hat;
 
-    delta_rot1_hat = Math::angle_diff(delta_rot1,
+    delta_rot1_hat = (delta_rot1 == 0.f) ? 0.f : Math::angle_diff(delta_rot1,
                      Math::sample_gaussian_dist(sqrt(this->alpha1*delta_rot1_noise*delta_rot1_noise + 
                             this->alpha2 * delta_trans * delta_trans)));
     delta_trans_hat = delta_trans - 
@@ -74,7 +80,7 @@ void Particle::applyOdomMotionModel(double delta_rot1, double delta_trans, doubl
                 // ", yaw_B: " << this->pose->yaw << std::endl;
     this->pose->x += delta_trans_hat * cos(this->pose->yaw + delta_rot1_hat);
     this->pose->y += delta_trans_hat * sin(this->pose->yaw + delta_rot1_hat);
-    this->pose->yaw += delta_rot1_hat + delta_rot2_hat;
+    this->pose->yaw += delta_rot2;//delta_rot1_hat + delta_rot2_hat;
 
     this->pose->yaw = Math::normalize(this->pose->yaw);
 
@@ -90,8 +96,8 @@ void Particle::applyOdomMotionModel(double delta_rot1, double delta_trans, doubl
 
     // std::cout << this->odomData->currOdom->x << ", " << this->odomData->currOdom->y  << ", "  << this->odomData->currOdom->yaw << std::endl;
     // std::cout << this->odomData->delta->x << ", " << this->odomData->delta->y  << ", "  << this->odomData->delta->yaw << std::endl;
-    std::cout << this->pose->x << ", " << this->pose->y << ", "  << this->pose->yaw << std::endl;
-    std::cout << row << ", " << col << std::endl;
+    // std::cout << this->pose->x << ", " << this->pose->y << ", "  << this->pose->yaw << std::endl;
+    // std::cout << row << ", " << col << std::endl;
 
     // make sure this doesn't exceed the map size???
     std::pair<uint, uint> map_dims = this->map->getMapDims();
@@ -125,6 +131,7 @@ void Particle::applySensorModel()
         angle =+ map->getSensorAngleIcr();
     }
     this->weight = q;
+    std::cout << this->weight << std::endl;
     // std::cout << "End of func" << std::endl;
 }
 

@@ -33,6 +33,7 @@ public:
     Particle(double weight);
     Particle(std::shared_ptr<Pose> _pose, double weight, uint map_pos_x, uint map_pos_y);
     ~Particle();
+    Particle (const Particle& p);
 
     static void setStatics(const std::shared_ptr<OdomData> odom_data, const std::shared_ptr<LidarData> lidar_data,
                           const std::shared_ptr<Map> _map);

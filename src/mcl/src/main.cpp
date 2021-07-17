@@ -27,9 +27,8 @@ int main(int argc, char **argv)
     auto start = std::chrono::system_clock::now();
     uint64_t secondsElapsed = 0;
     
-    std::shared_ptr<Map> map = std::make_shared<Map>(90, LIDAR_MAX_RANGE, ANGLE_INCREMENT, 0, 0);
-    std::string pathToFile = "/home/zarak/mcl/src/mcl/src";
-    map->loadMapFromFile(pathToFile, "grid_map.csv", true);
+    std::shared_ptr<Map> map = std::make_shared<Map>(20, LIDAR_MAX_RANGE, ANGLE_INCREMENT, 0, 0);
+    map->loadMapFromFile("/home/zarak/ROS-MCL/src/mcl/src/grid_map.csv", true);
     // map->update_image();
 
     std::shared_ptr<MCL> mcl = std::make_shared<MCL>(NUM_PARTICLES, odom_data, lidar_data, map);

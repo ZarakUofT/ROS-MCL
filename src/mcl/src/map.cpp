@@ -35,11 +35,9 @@ void Map::init_figure()
     this->axes->grid(false);
 }
 
-void Map::loadMapFromFile(std::string& path_to_file, std::string file_name, 
-                        bool find_angular_ranges) 
+void Map::loadMapFromFile(std::string file_name, bool find_angular_ranges) 
 {
-    std::string file = path_to_file + "/" + file_name;
-    std::ifstream in_file(file);
+    std::ifstream in_file(file_name);
     
     // Make sure the file is open
     if(!in_file.is_open()) throw std::runtime_error("Could not open file");
@@ -177,7 +175,7 @@ bool Map::computeAngularRangesThread_func(uint start, uint end){
         phi = 0.0;
         ARR_1D_to_2D(i, coords.x, coords.y);
 
-        while (phi < DEG2RAD(this->laserBeams)) {
+        while (phi < 2*M_PI) {
             position = Math::pos_in_2d_array(this->mapWidth, this->mapHeight, coords.x, coords.y, 0.0, phi, 
                 this->rangeSensorMaxRange / this->gridCellSize, this->rangeSensorMaxRange / this->gridCellSize);
 
@@ -185,7 +183,7 @@ bool Map::computeAngularRangesThread_func(uint start, uint end){
             dist = (position.isInfinity()) ? INFINITY : this->computeEuclidian(coords.x, coords.y, position.x, position.y);
             this->occupancyGridMap[i].expectedRange.push_back(static_cast<float>(dist));
 
-            phi += 2 * (this->rangeSensorAngleIncrement);
+            phi += this->angleIncrement;
         }
     }
 
@@ -280,7 +278,7 @@ Pose Map::getPose(uint map_pos_x, uint map_pos_y){
 float Map::getActualRange(uint pos_x, uint pos_y, double angle) {
     uint index = this->ARR_2D_to_1D(pos_x, pos_y);
     uint range_index = floor(angle / this->angleIncrement);
-
+    
     // std::cout << angle << std::endl;
     // std::cout << index << ", " << range_index << std::endl;
     // std::cout << pos_x << ", " << pos_y << std::endl;
